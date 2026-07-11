@@ -5,7 +5,7 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
-  workflow_dispatch:  # 允许手动触发
+  workflow_dispatch:
 
 jobs:
   build:
@@ -21,6 +21,16 @@ jobs:
 
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
+
+    # 关键修复：删除过时的 JVM 参数
+    - name: Remove unsupported JVM option
+      run: |
+        if [ -f gradle.properties ]; then
+          sed -i '/MaxPermSize/d' gradle.properties
+        fi
+
+    - name: Make gradlew executable
+      run: chmod +x gradlew
 
     - name: Build Debug APK
       run: ./gradlew assembleDebug
